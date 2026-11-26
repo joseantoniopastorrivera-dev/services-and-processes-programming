@@ -3,7 +3,7 @@
 > Enunciados: `psp-ut1-ejercicios-1.docx`. Código: [`../soluciones/processbuilder/src/PSP/`](../soluciones/processbuilder/src/PSP/). Teoría: [`../apuntes/apuntes-ut1-procesos.md`](../apuntes/apuntes-ut1-procesos.md).
 >
 > Cada ejercicio funciona en **Linux** (examen) y en **Windows** (casa). En el examen se escribe directamente el comando de Linux: es el **primero** de cada `SO.comando(linux, windows)`.
-> Salidas: **Windows = reales**. **Linux = lo esperado** según la teoría, pendiente de comprobar en la VM «PSP Ubuntu» (se marcará ✅ al probarlo).
+> Salidas: **Windows y Linux = reales**. ✅ Linux comprobado el 26/11/2026 en la VM «PSP Ubuntu» (Ubuntu Server 24.04, OpenJDK 21, 2 núcleos): todo sale como predice la teoría.
 >
 > ⚠️ El enunciado usa comandos de **macOS** (`open -a Calculator`), que **no existen** ni en Linux ni en Windows.
 
@@ -35,7 +35,15 @@ Process p = new ProcessBuilder("gnome-calculator").start();   // o "kcalc" si el
 La solución prueba una lista de calculadoras hasta que una arranca, porque cada escritorio de Linux trae la suya: `start()` lanza `IOException` si el ejecutable no existe, se captura y se prueba el siguiente.
 
 - `start()` **no espera**: el programa Java sigue (y termina) mientras la calculadora queda abierta.
-- **Ubuntu Server (la VM) no tiene escritorio**: allí no hay calculadora y el programa lo indica.
+- **Ubuntu Server (la VM) no tiene escritorio**: allí no hay calculadora y el programa lo indica. ✅ Salida real en la VM:
+
+```text
+«gnome-calculator» no está instalado, pruebo el siguiente...
+«kcalc» no está instalado, pruebo el siguiente...
+«galculator» no está instalado, pruebo el siguiente...
+«xcalc» no está instalado, pruebo el siguiente...
+No se ha encontrado ningún programa para: Calculadora (¿Ubuntu Server sin escritorio?)
+```
 
 ### Ejercicio 2. ¿Quién es quién?
 
@@ -114,7 +122,13 @@ noexiste.invalid → Código de salida de ping: 1 → noexiste.invalid NO respon
 ```
 
 - En Linux `ping` sin `-c` **no termina nunca** (envía paquetes sin parar): el `waitFor()` se quedaría colgado.
-- Linux devuelve 2 cuando el nombre no se resuelve y 1 cuando no hay respuesta; en los dos casos es ≠ 0.
+- Linux devuelve 2 cuando el nombre no se resuelve y 1 cuando no hay respuesta; en los dos casos es ≠ 0. ✅ Salida real (Linux):
+
+```text
+localhost → Código de salida de ping: 0 → localhost responde
+noexiste.invalid → Código de salida de ping: 2 → noexiste.invalid NO responde
+192.0.2.1 → Código de salida de ping: 1 → 192.0.2.1 NO responde      (IP reservada que nunca contesta)
+```
 
 ### Ejercicio 6. Trabajar en otra carpeta
 
@@ -128,7 +142,7 @@ System.out.println(new File("pruebas", "fichero.txt").exists());   // true
 - `directory()` cambia la **carpeta de trabajo del hijo**, no la del programa Java. Las rutas relativas del hijo se resuelven desde ahí.
 - En Windows funciona el `>` porque se lo damos **a `cmd`** dentro de una sola cadena: es `cmd`, no Java, quien redirige.
 
-Salida real: `Código de salida: 0 · ¿Existe pruebas\fichero.txt?: true`.
+Salida real: `Código de salida: 0 · ¿Existe pruebas\fichero.txt?: true` (✅ Linux: `¿Existe pruebas/fichero.txt?: true`).
 
 ---
 
@@ -144,14 +158,14 @@ for (int i...) procesos[i] = new ProcessBuilder("sleep", "" + SEGUNDOS[i]).start
 for (Process p : procesos) p.waitFor();
 ```
 
-Salida real (Windows, con PowerShell `Start-Sleep`):
+Salida real:
 
-```text
-Versión A (secuencial): 10,48 s
-Versión B (paralela):    5,60 s
-```
+| | Windows (PowerShell `Start-Sleep`) | ✅ Linux (`sleep`) |
+|---|---|---|
+| Versión A (secuencial) | 10,48 s | 9,07 s |
+| Versión B (paralela) | 5,60 s | 5,01 s |
 
-**Reflexión:** secuencial = **suma** (3 + 5 + 1 = 9 s); paralelo = el **más lento** (5 s). En Windows sale algo más porque arrancar cada PowerShell cuesta casi medio segundo. En **Linux**, con `sleep`, sale prácticamente 9,0 s y 5,0 s.
+**Reflexión:** secuencial = **suma** (3 + 5 + 1 = 9 s); paralelo = el **más lento** (5 s). En Windows sale algo más porque arrancar cada PowerShell cuesta casi medio segundo; en Linux `sleep` arranca en milisegundos y sale casi exacto.
 
 ### Ejercicio 8. Java lanza Java
 
@@ -163,9 +177,9 @@ Process hijo = new ProcessBuilder("java", "-cp", "bin", "PSP.Hijo", "42").start(
 System.out.println(hijo.waitFor());   // 42
 ```
 
-Salida real (Windows) y esperada (Linux):
+Salida real (Windows y Linux):
 
-| `System.exit(...)` | Windows (real) | Linux |
+| `System.exit(...)` | Windows (real) | ✅ Linux (real) |
 |---|---|---|
 | 0 · 5 · 42 | 0 · 5 · 42 | 0 · 5 · 42 |
 | 300 | 300 | **44** |
@@ -190,13 +204,13 @@ if (!p.waitFor(3, TimeUnit.SECONDS)) {
 System.out.println(p.exitValue());
 ```
 
-Salida real (Windows):
+Salida real (Windows y ✅ Linux):
 
 ```text
 ¿Terminó en 3 s?: false
 Antes de destroy(). ¿Vivo?: true
 Después de destroy(). ¿Vivo?: false
-Código de salida: 1          ← Linux: 143
+Código de salida: 1          ← Linux (real): 143
 ```
 
 **Reflexión:** en Linux, `destroy()` envía **SIGTERM** (señal **15**, «terminación»: le pide al proceso que acabe). Cuando un proceso muere por una señal, su código de salida es **128 + nº de señal** → 128 + 15 = **143**. En Windows no hay señales: se usa `TerminateProcess` y el código es 1.
@@ -214,7 +228,7 @@ if (!p.waitFor(2, TimeUnit.SECONDS)) {       // en Linux NO termina: ignora SIGT
 
 | | `destroy()` | `destroyForcibly()` | Código |
 |---|---|---|---|
-| **Linux** | SIGTERM, que el `trap '' TERM` **ignora** → sigue vivo | SIGKILL (9): **no se puede ignorar** | **137** = 128 + 9 |
+| ✅ **Linux** (real) | SIGTERM, que el `trap '' TERM` **ignora** → sigue vivo (`¿Ha terminado con destroy()?: false`) | SIGKILL (9): **no se puede ignorar** | **137** = 128 + 9 |
 | **Windows** (real) | Ya lo termina: no hay señales que ignorar | Igual que `destroy()` | 1 |
 
 **Reflexión:** **pedir** (SIGTERM) deja que el proceso decida: puede limpiar, guardar o incluso ignorarlo. **Obligar** (SIGKILL) lo hace el kernel, sin que el proceso pueda hacer nada. Por eso el código es 137 (señal 9) y no 143 (señal 15).
@@ -234,14 +248,26 @@ while (it.hasNext()) {
 }
 ```
 
-**Linux (esperado):** `children() = 2`, `descendants() = 3`.
+✅ **Linux (real):** `children() = 2`, `descendants() = 3`.
 
 ```text
-sh (padre, PID 100)
-├── sh -c 'sleep 60 & wait'   (hijo, 101)
-│   └── sleep 60              (nieto, 103)
-└── sleep 60                  (hijo, 102)
+Proceso padre: PID 8691
+children():    2
+descendants(): 3
+  PID 8692 · padre 8691 · /usr/bin/dash -c sleep 60 & wait
+  PID 8693 · padre 8691 · /usr/bin/sleep 60
+  PID 8694 · padre 8692 · /usr/bin/sleep 60
+Después de destruir: padre vivo = false, descendientes vivos = 0
 ```
+
+```text
+sh (padre, 8691)
+├── sh -c 'sleep 60 & wait'   (hijo, 8692)
+│   └── sleep 60              (nieto, 8694)
+└── sleep 60                  (hijo, 8693)
+```
+
+En Ubuntu, `sh` es en realidad `dash` (por eso aparece `/usr/bin/dash`).
 
 **Windows (real):** como no hay `sh`, se construye el mismo árbol con procesos Java (`NodoArbol`), pero salen `children() = 3` y `descendants() = 7`, porque **cada proceso de consola tiene además un hijo `conhost.exe`** (el anfitrión de consola de Windows).
 
@@ -273,7 +299,21 @@ Proceso 26580 terminado con código 1
 Hasta luego.
 ```
 
-Para probar la ampliación en Linux: en otra terminal, `sleep 300 &` y `echo $!` muestra su PID; en el gestor, la opción 4 con ese PID.
+✅ Salida real (Linux):
+
+```text
+Comando (p. ej. sleep 100): Lanzado con PID 8791
+PID 8791 · sleep 100 · vivo
+PID a terminar: Aviso: el PID 99999 no es de ningún proceso lanzado por el gestor.
+PID de cualquier proceso: Proceso: /usr/bin/sleep 300
+Petición de terminar enviada.
+PID de cualquier proceso: Proceso: /sbin/init
+No se ha podido terminar (¿sin permisos?).
+Proceso 8791 terminado con código 143
+Hasta luego.
+```
+
+Para probar la ampliación en Linux: en otra terminal, `sleep 300 &` y `echo $!` muestra su PID; en el gestor, la opción 4 con ese PID. Con el PID **1** (`init`/`systemd`, de root) sale «sin permisos»: un usuario normal no puede matar procesos de otro usuario. Al salir, el `sleep 100` termina con **143** (SIGTERM).
 
 > Además, si se cierra la entrada (Ctrl+D en Linux, Ctrl+Z en Windows), el gestor sale ordenadamente en vez de lanzar una excepción.
 
