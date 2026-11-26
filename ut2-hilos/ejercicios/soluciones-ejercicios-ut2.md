@@ -31,7 +31,28 @@
 - El nombre de la clase va **con su paquete** (`bloque1.descargas.DescargasConHilos`) y **sin** `.java` ni `.class`.
 - Las salidas de abajo usan coma decimal (`4,00 s`) porque el sistema está en español. En una máquina en inglés saldría `4.00 s`.
 
-> ⏳ **Pendiente de comprobar en Linux** (máquina virtual *PSP Ubuntu*). Lo esperable: los ejercicios correctos dan lo mismo, y los del bloque 3 fallan igual, aunque con otros números.
+### ✅ Comprobado en Linux (26/11/2026)
+
+Los 18 programas se compilaron con `javac -d out $(find src -name '*.java')` y se ejecutaron **dos veces** cada uno en la VM *PSP Ubuntu* (Ubuntu Server 24.04, OpenJDK 21, **2 núcleos**). Resultado: los ejercicios correctos dan lo mismo que en Windows, y los del bloque 3 fallan igual, con otros números.
+
+| Ejercicio | Linux (2 ejecuciones) |
+|---|---|
+| 1.1 Descargas | Secuencial 12,10 / 12,23 s · con hilos **4,01 / 4,00 s** |
+| 1.2 Tarea pesada | 539.777 primos en ~1,7-2,2 s en las tres versiones (los hilos no la aceleran: sirven para **no bloquear** el `main`) |
+| 2.1 Estados | `NEW → RUNNABLE → TIMED_WAITING → RUNNABLE → WAITING → BLOCKED → RUNNABLE → TERMINATED` (igual las dos veces) |
+| 2.2 Examen | Ana 12/20 y 11/20, examen retirado · varios alumnos: entre 10 y 14 preguntas cada uno |
+| 2.3 Autoguardado | 4 autoguardados (14, 28, 54 y 67 caracteres) y cierre con 14 palabras |
+| 2.4 Taxis | Total de la flota: 110 km y 127 km (aleatorio en cada ejecución) |
+| 3.1 Informe | Sin `join()`: **0 €, INCORRECTO**. Con `join()`: CORRECTO (50.517.044 € y 50.552.584 €) |
+| 3.2 Jardín | **Pierde visitantes** en algunas vueltas (55.905, 90.206, 552.692…) y en otras sale 2.000.000 · con 1.000 por puerta, siempre OK |
+| 3.3 Vigilante | El total `volatile` **no cuadra**: 213.747.248 frente a 250.300.226 rondas |
+| 3.4 Cine | **Overbooking** en todas las sesiones: 103 a 107 entradas vendidas de 100 |
+| 4.1 Jardín corregido | Siempre 4.000.000; mejor tiempo `AtomicInteger` 22 ms < `synchronized` 51 ms < `ReentrantLock` 75 ms |
+| 4.2 Cine corregido | Sin proteger y «solo el descuento»: overbooking · `synchronized` y reserva + cobro fuera: **100/0** siempre (la reserva, 34-37 ms frente a 167-279 ms) |
+| 4.3 Turnos | Sin protección: **hasta 21.836 números repetidos** · `synchronized` y CAS: 0 repetidos |
+| 4.4 Banco | Sin protección: **no cuadra** (de 1.864 € a 32.021 €) · un cerrojo y cerrojo por cuenta: 10.000 € siempre |
+
+**Diferencia con Windows:** con solo **2 núcleos**, los fallos de carrera salen **menos a menudo** (en el jardín, varias vueltas aciertan por casualidad). Por eso hay que ejecutar **varias veces**: que salga bien una vez no demuestra que el código sea correcto.
 
 ---
 
