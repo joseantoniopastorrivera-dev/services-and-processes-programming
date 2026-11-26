@@ -3,7 +3,7 @@
 > Enunciados: `ejercicios-comunicacion-entre-procesos/ut1-ej-comprocesos.pdf`. Código: [`../soluciones/comunicacion/src/PSP/`](../soluciones/comunicacion/src/PSP/), basado en la solución del profesor (`UT1_Comunicacion_Solucion.zip`) y ampliado con la versión de **Windows**.
 > Teoría: [`../apuntes/apuntes-ut1-procesos.md`](../apuntes/apuntes-ut1-procesos.md) (puntos 8 a 10).
 >
-> Salidas: **Windows = reales**. **Linux = lo esperado**, pendiente de comprobar en la VM «PSP Ubuntu».
+> Salidas: **Windows y Linux = reales**. ✅ Linux comprobado el 26/11/2026 en la VM «PSP Ubuntu» (Ubuntu Server 24.04, OpenJDK 21, 2 núcleos). Los 15 ejercicios funcionan; las diferencias con Windows están marcadas con ✅.
 
 **Compilar y ejecutar** (desde `soluciones/comunicacion/`, donde están `bin/` y `datos/`):
 
@@ -55,7 +55,7 @@ Salida real: `[HIJO] Hola desde el hijo · Código de salida: 0`.
 
 `ejecutar(String comando)` lanza el comando, lee **la primera línea**, espera y la devuelve. `whoami` y `hostname` existen igual en Linux y en Windows.
 
-Salida real (Windows): `Usuario desktop-ivbhl4h\usuario en el equipo DESKTOP-IVBHL4H` (en Linux sale solo el usuario: `Usuario alumno en el equipo pc-aula12`).
+Salida real (Windows): `Usuario desktop-ivbhl4h\usuario en el equipo DESKTOP-IVBHL4H` (✅ en Linux sale solo el usuario, sin dominio: `Usuario alumno en el equipo ubuntu-server-24-lts`).
 
 ### Ejercicio 3. Saludo según la hora
 
@@ -94,6 +94,20 @@ Código de salida: 1
 
 El hijo sigue vivo porque aún tiene salida pendiente que nadie lee; si no se terminara, podría quedarse bloqueado con la tubería llena.
 
+✅ Salida real (Linux):
+
+```text
+Los 5 ficheros más grandes de /usr/bin:
+1. dockerd
+2. containerd
+3. docker
+4. x86_64-linux-gnu-lto-dump-13
+5. rootlesskit
+Código de salida: 0
+```
+
+En Linux no sale «(el hijo sigue vivo…)» y el código es **0**: `/usr/bin` tiene pocos cientos de nombres, que caben enteros en el búfer de la tubería (64 KB en Linux), así que `ls` termina antes de que el padre lea el quinto. Que el `destroy()` haga falta o no **depende de cuánta salida quede pendiente**: por eso la solución pregunta `isAlive()` antes.
+
 ---
 
 ## Nivel 2 · Errores y códigos de salida
@@ -115,7 +129,7 @@ Línea 2: El gato duerme y el perro ladra.
 Línea 3: Un gato, un perro y un pez.
 "gato" aparece en 3 líneas
 "caballo" no aparece en datos/texto.txt
-Error (código 1): FINDSTR: No se puede abrir noexiste.txt      ← Linux: código 2, "grep: noexiste.txt: No such file or directory"
+Error (código 1): FINDSTR: No se puede abrir noexiste.txt      ← ✅ Linux: Error (código 2): grep: noexiste.txt: No such file or directory
 ```
 
 > Trampa de Windows: `findstr` toma la `/` de `datos/texto.txt` como el inicio de una opción. Se pasa la ruta con `File.separatorChar`.
@@ -146,7 +160,16 @@ Salida real (Windows):
 Correctos: 2 de 5
 ```
 
-En Linux: `[FALLO 2] ls carpetaQueNoExiste -> ls: cannot access 'carpetaQueNoExiste': No such file or directory` y `[FALLO 1] cat ...`.
+✅ Salida real (Linux):
+
+```text
+[OK]        date
+[FALLO 2]   ls carpetaQueNoExiste -> ls: cannot access 'carpetaQueNoExiste': No such file or directory
+[NO EXISTE] comandoInventado
+[FALLO 1]   cat ficheroQueNoExiste.txt -> cat: ficheroQueNoExiste.txt: No such file or directory
+[OK]        whoami
+Correctos: 2 de 5
+```
 
 **Reflexión:** `comandoInventado` **nunca llega a ser un proceso**: `start()` no encuentra el ejecutable y lanza `IOException`, así que no hay código de salida. `ls carpetaQueNoExiste` **sí** se ejecuta (el programa `ls` existe) y es él quien falla y devuelve 2.
 
@@ -171,6 +194,8 @@ String resultado = salida.readLine();
 
 Salida real (Windows): `7/2 = 3,5 · [math]::Pow(2,10) = 1024 · hola + → No se puede calcular...`.
 
+✅ Salida real (Linux): `7/2 = 3.50000000000000000000 · 2^10 = 1024 · hola + → No se puede calcular "hola +": (standard_in) 2: syntax error (código 0)`. Ojo: `bc` devuelve **0 aunque la expresión esté mal**; el error solo se detecta porque escribió algo en **stderr**.
+
 - `bc` escribe los errores por **stderr** (y empieza con una línea en blanco: la solución la salta).
 - `close()` es imprescindible: es lo que le dice a `bc` «ya no hay más expresiones».
 
@@ -181,7 +206,7 @@ Process p = new ProcessBuilder("tr", "A-Za-z", "N-ZA-Mn-za-m").start();   // Win
 pw.println(texto); pw.close();
 ```
 
-Salida real (Windows, con el `tr` de Git):
+Salida real (Windows, con el `tr` de Git; ✅ en Linux sale idéntica):
 
 ```text
 Texto: Hola Mundo, España
@@ -278,6 +303,8 @@ Entrada añadida: === 09/11/2026 13:15:05 ===
 El diario tiene 2 entradas (1146 bytes)
 ```
 
+✅ En Linux: `El diario tiene 1 entradas (242 bytes)` y luego `2 entradas (484 bytes)`: cada entrada ocupa menos porque `ls -l` es más corto que el `dir` de Windows (sin cabecera de volumen ni resumen).
+
 `Redirect.to(f)` sobrescribe en cada ejecución; `Redirect.appendTo(f)` **añade**, que es lo que pide un diario.
 
 ### Ejercicio 13. Palabras de un texto con una tubería
@@ -328,6 +355,8 @@ Paralelo:   602489 primos en 2466 ms
 El paralelo es 2,0 veces más rápido
 ```
 
+✅ Salida real (Linux, VM con **2 núcleos**): mismos recuentos (602489 = 216816 + 196033 + 189640), `Secuencial: 4385 ms · Paralelo: 2619 ms · 1,7 veces más rápido`. Con 2 núcleos, tres hijos no pueden ir a la vez: el techo teórico es ×2.
+
 **Reflexión:**
 - **No es 3 veces más rápido** porque: (1) cada hijo arranca una JVM (tiempo fijo que no se reparte); (2) los rangos **no cuestan lo mismo**: comprobar números grandes cuesta más (más divisores hasta la raíz), así que el último hijo tarda más y el total depende del **más lento**; (3) el SO y otros procesos también usan núcleos.
 - **Cada hijo encuentra menos primos que el anterior** porque los primos son cada vez **más escasos** al crecer los números (alrededor de n hay aproximadamente 1 primo de cada ln(n) números).
@@ -344,6 +373,8 @@ Intento 5: 71 -> mayor
 Intento 6: 73 -> acertado
 ¡Adivinado en 6 intentos!
 ```
+
+✅ En Linux, idéntico con el secreto 73 (6 intentos: 50, 75, 62, 68, 71, 73). Los ejercicios 1, 3, 5, 9, 10, 11 y 13 también dan en Linux exactamente las salidas de arriba.
 
 Con 100 números, la búsqueda binaria acierta **siempre en 7 intentos como máximo** (2⁷ = 128 ≥ 100).
 
