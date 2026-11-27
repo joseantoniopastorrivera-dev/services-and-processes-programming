@@ -9,6 +9,7 @@ Reglas comunes a todos mis repos (copia de mi `C:\dev\CLAUDE.md`, para que tambi
 - Si ves un error de concepto o algo que no entiendo bien, dímelo aunque no te lo pregunte.
 - Responde en español.
 - No hagas commit ni push sin que te lo pida. Commits sin `Co-Authored-By` ni líneas de atribución.
+- **Commits en GitHub:** uno por cambio, nunca mezclados, cada uno con su push. Mensaje en inglés profesional y técnico (conventional commits: `type(scope): summary`, en imperativo), con un cuerpo que explica qué cambia y por qué.
 - **Pull requests en todos los repos (asignaturas y personales):** nunca se commitea directo en `main`. Una rama por cambio (nombre con guiones, sin barra: con barra GitHub dio error 500), sus commits pequeños, `gh pr create --fill --base main`, tests en local y CI en verde (`gh pr checks <n> --watch`), y `gh pr merge <n> --merge --delete-branch` (nunca squash, para que cada commit quede en el historial). Si el repo no tiene tests o CI para lo que cambia, dilo y propón añadirlos. Si la carpeta la comparten otras sesiones, trabaja en un worktree propio y no cambies de rama allí. Sigue valiendo que el commit, push y merge solo se hacen cuando yo lo pida.
 - No subas binarios generados (`target/`, `*.class`, `__pycache__/`, `*.pyc`, `bin/`, `obj/`, `Library/` de Unity).
 - Nunca leas, muestres ni subas ficheros `.env`, tokens ni credenciales.
@@ -18,10 +19,11 @@ Programación concurrente en Java: procesos, hilos y (más adelante) sockets y s
 
 ## Estructura
 - `ut0-repaso/` — repaso de Java y streams (PDF/PPTX).
-- `ut1-procesos/apuntes/` — `psp-ut1.pdf` y `ejemplos-en-clase/` (Lanzador*.java y el proyecto IntelliJ `ut1-ejemplos-comunicacion-procesos`, paquete `PSP`: ProcessBuilder, redirecciones, pipes, inheritIO).
+- `ut1-procesos/apuntes/` — `psp-ut1.pdf`, `apuntes-ut1-procesos.md` y `ejemplos-en-clase/` (Lanzador*.java y el proyecto IntelliJ `ut1-ejemplos-comunicacion-procesos`, paquete `PSP`: ProcessBuilder, redirecciones, pipes, inheritIO).
 - `ut1-procesos/ejercicios/` — enunciados y proyecto IntelliJ `ut1-procesos` (configuraciones en `run/`).
 - `ut1-procesos/practica/`
-- `ut1-procesos/soluciones/` — soluciones de los ejercicios y tareas de la UT1 (Linux y Windows); `apuntes/apuntes-ut1-procesos.md`.
+- `ut1-procesos/examen/` — `examen-ut1.md`, `ut1-examen-alumno/` y `solucion/` (configuraciones en `.run/`).
+- `ut1-procesos/soluciones/` — soluciones de los ejercicios y tareas de la UT1 (Linux y Windows).
 - `ut2-hilos/apuntes/` — unidad en curso.
 - `ut2-hilos/ejercicios/` — enunciado, proyecto IntelliJ `bloque1-4` de la profesora (paquetes `bloqueN.<ejercicio>`, no tocar) y `soluciones-ejercicios-ut2.md`.
 - `ut2-hilos/soluciones/bloque1-4/` — copia del proyecto con los TODO resueltos y comentados línea a línea.
