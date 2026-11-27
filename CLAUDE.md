@@ -19,10 +19,11 @@ Programación concurrente en Java: procesos, hilos y (más adelante) sockets y s
 
 ## Estructura
 - `ut0-repaso/` — repaso de Java y streams (PDF/PPTX).
-- `ut1-procesos/apuntes/` — `psp-ut1.pdf` y `ejemplos-en-clase/` (Lanzador*.java y el proyecto IntelliJ `ut1-ejemplos-comunicacion-procesos`, paquete `PSP`: ProcessBuilder, redirecciones, pipes, inheritIO).
+- `ut1-procesos/apuntes/` — `psp-ut1.pdf`, `apuntes-ut1-procesos.md` y `ejemplos-en-clase/` (Lanzador*.java y el proyecto IntelliJ `ut1-ejemplos-comunicacion-procesos`, paquete `PSP`: ProcessBuilder, redirecciones, pipes, inheritIO).
 - `ut1-procesos/ejercicios/` — enunciados y proyecto IntelliJ `ut1-procesos` (configuraciones en `run/`).
 - `ut1-procesos/practica/`
-- `ut1-procesos/soluciones/` — soluciones de los ejercicios y tareas de la UT1 (Linux y Windows); `apuntes/apuntes-ut1-procesos.md`.
+- `ut1-procesos/examen/` — `examen-ut1.md`, `ut1-examen-alumno/` y `solucion/` (configuraciones en `.run/`).
+- `ut1-procesos/soluciones/` — soluciones de los ejercicios y tareas de la UT1 (Linux y Windows).
 - `ut2-hilos/apuntes/` — unidad en curso.
 - `ut2-hilos/ejercicios/` — enunciado, proyecto IntelliJ `bloque1-4` de la profesora (paquetes `bloqueN.<ejercicio>`, no tocar) y `soluciones-ejercicios-ut2.md`.
 - `ut2-hilos/soluciones/bloque1-4/` — copia del proyecto con los TODO resueltos y comentados línea a línea.
